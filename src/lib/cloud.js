@@ -33,12 +33,15 @@ export function normalizeTokenInput(raw) {
   return m ? m[1] : s;
 }
 
-// мгновенная проверка: работает ли токен (возвращает логин аккаунта)
+// мгновенная проверка: работает ли токен (проверяет доступ к репозиторию)
 export async function checkToken(customToken) {
   const t = customToken ? normalizeTokenInput(customToken) : getToken();
   if (!t) throw new Error('Токен не указан');
-  const u = await gh('/user', 'GET', null, t);
-  return u && u.login ? String(u.login) : 'ok';
+  const r = await gh('', 'GET', null, t);
+  if (r && r.permissions && !r.permissions.push) {
+    throw new Error('У токена нет прав на запись (Contents: Read and write)');
+  }
+  return r && r.owner && r.owner.login ? String(r.owner.login) : 'ok';
 }
 export function hasToken() { return Boolean(getToken()); }
 
