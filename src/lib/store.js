@@ -1,6 +1,6 @@
-// Simple localStorage store for Sushi ORDO
-const KEY = 'sushi-ordo-menu-v2';
-const OLD_KEYS = ['cafe-menu-v3', 'cafe-menu-v2'];
+// Simple localStorage store for Мангал-Бургер (v3)
+const KEY = 'mangal-burger-menu-v3';
+const OLD_KEYS = ['sushi-ordo-menu-v2', 'cafe-menu-v3', 'cafe-menu-v2'];
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
 
@@ -36,112 +36,25 @@ function normalizeItem(raw, i) {
   };
 }
 
+const SLIDE_DUR = 18;
+const MIX_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'blinds', 'displacement'];
+
+function makeSlides(tvId, count) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `s_${tvId}_${i + 1}`,
+    type: 'image',
+    bg: `/cafe-menu-board-v3/data/img/${tvId}-${String(i + 1).padStart(2, '0')}.jpg`,
+    duration: SLIDE_DUR,
+    transition: MIX_POOL[i % MIX_POOL.length],
+    items: [],
+  }));
+}
+
 const RAW_DEFAULT = {
   screens: [
-    {
-      id: 'tv1',
-      name: 'Экран 1',
-      slides: [
-        {
-          id: 's_tv1_1',
-          type: 'image',
-          bg: '/cafe-menu-board-v2/data/img/tv2-12.jpg',
-          duration: 20,
-          transition: 'fade',
-          items: [
-            { title: 'Морской бриз', desc: '', price: '777 с.', x: 3, y: 17, w: 14 },
-            { title: 'Лосось Манго', desc: '', price: '497 с.', x: 82, y: 9, w: 14 },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'tv2',
-      name: 'Экран 2',
-      slides: [
-        {
-          id: 's_tv2_1',
-          type: 'image',
-          bg: '/cafe-menu-board-v2/data/img/tv3-01.jpg',
-          duration: 20,
-          transition: 'fade',
-          items: [
-            { title: 'Кани Маки', desc: 'Краб, рис, нори', price: '130.-', x: 6, y: 28, w: 16 },
-            { title: 'Саке Маки', desc: 'Лосось, рис, нори', price: '200.-', x: 28, y: 46, w: 16 },
-            { title: 'Унаги Маки', desc: 'Угорь, унаги, кунжут', price: '230.-', x: 74, y: 68, w: 16 },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'tv3',
-      name: 'Экран 3',
-      slides: [
-        {
-          id: 's_tv3_1',
-          type: 'image',
-          bg: '/cafe-menu-board-v2/data/img/tv3-02.jpg',
-          duration: 20,
-          transition: 'fade',
-          items: [
-            { title: 'Калифорния Тобико', desc: 'Снежный краб, авокадо', price: '340.-', x: 2, y: 76, w: 18 },
-            { title: 'Калифорния Маки', desc: 'Классический крабовый ролл', price: '330.-', x: 60, y: 76, w: 18 },
-            { title: 'Сливочный угорь', desc: 'Нежный сыр, угорь, унаги', price: '390.-', x: 6, y: 38, w: 18 },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'tv4',
-      name: 'Экран 4',
-      slides: [
-        {
-          id: 's_tv4_1',
-          type: 'image',
-          bg: '/cafe-menu-board-v2/data/img/tv2-08.jpg',
-          duration: 20,
-          transition: 'fade',
-          items: [
-            { title: 'Сет Дабл', desc: 'Большой набор для двоих', price: '1430.-', x: 4, y: 78, w: 26 },
-            { title: 'Сет Темпура', desc: 'Хрустящие горячие роллы', price: '1500.-', x: 66, y: 44, w: 26 },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'tv5',
-      name: 'Экран 5',
-      slides: [
-        {
-          id: 's_tv5_1',
-          type: 'image',
-          bg: '/cafe-menu-board-v2/data/img/tv2-10.jpg',
-          duration: 20,
-          transition: 'fade',
-          items: [
-            { title: 'Сет Самурай', desc: 'Фирменный набор роллов', price: '1300.-', x: 74, y: 16, w: 22 },
-            { title: 'Филадельфия Макси', desc: 'Много свежего лосося', price: '1610.-', x: 6, y: 12, w: 24 },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'tv6',
-      name: 'Экран 6',
-      slides: [
-        {
-          id: 's_tv6_1',
-          type: 'image',
-          bg: '/cafe-menu-board-v2/data/img/tv3-06.jpg',
-          duration: 20,
-          transition: 'fade',
-          items: [
-            { title: 'Унаги Фьюжн', desc: 'Запеченный угорь, спайси', price: '420.-', x: 32, y: 80, w: 18 },
-            { title: 'Яки Унаги маки', desc: 'Горячий запеченный ролл', price: '370.-', x: 78, y: 80, w: 18 },
-          ],
-        },
-      ],
-    },
+    { id: 'tv1', name: 'Экран 1', slides: makeSlides('tv1', 10) },
+    { id: 'tv2', name: 'Экран 2', slides: makeSlides('tv2', 5) },
+    { id: 'tv3', name: 'Экран 3', slides: makeSlides('tv3', 9) },
   ],
 };
 
@@ -154,14 +67,14 @@ export function normalizeStore(raw) {
       id: sl.id,
       type: sl.type || 'image',
       bg: sl.bg,
-      duration: sl.duration || 7,
-      transition: sl.transition || 'fade',
+      duration: sl.duration || 18,
+      transition: sl.transition || 'fire',
       items: (sl.items || []).map((it, idx) => normalizeItem(it, idx)),
     })),
   }));
 
-  // Гарантируем наличие всех 6 экранов (tv1 .. tv6)
-  for (let i = 1; i <= 6; i++) {
+  // Гарантируем наличие всех 3 экранов (tv1 .. tv3)
+  for (let i = 1; i <= 3; i++) {
     const id = `tv${i}`;
     if (!screens.some((s) => s.id === id)) {
       const defSc = RAW_DEFAULT.screens.find((s) => s.id === id);
@@ -235,13 +148,20 @@ export function createEmptyItem() {
 export function makeId() { return uid(); }
 
 export const TRANSITIONS = [
-  { id: 'fade', label: 'Fade + Scale (дорого)' },
+  { id: 'auto', label: '✨ Микс (авто-переключение эффектов)' },
+  { id: 'fire', label: '🔥 Огненный всполох (Мангал)' },
+  { id: 'prism', label: '🌈 Неоновая призма' },
+  { id: 'crt', label: '📺 Ретро-ТВ (Включение / Канал)' },
+  { id: 'curtain', label: '🎭 Яркая шторка' },
+  { id: 'zoomBurst', label: '💥 Взрывной зум + вспышка' },
+  { id: 'flip3d', label: '🧊 3D Переворот' },
+  { id: 'blinds', label: '🪟 Жалюзи' },
+  { id: 'displacement', label: '🌊 Жидкая волна (GL Warp)' },
+  { id: 'fade', label: 'Fade + Scale' },
   { id: 'slide', label: 'Slide влево' },
   { id: 'zoom', label: 'Zoom + Blur' },
-  { id: 'blinds', label: 'Жалюзи' },
   { id: 'cube', label: '3D Cube' },
   { id: 'pixel', label: 'Pixelate' },
-  { id: 'displacement', label: 'Displacement (GL Warp)' },
 ];
 
 export const DEFAULT_STYLE = defaultStyle();

@@ -101,7 +101,7 @@ export default function Admin() {
       cacheStore(storeRef.current, Date.parse(at) || Date.now());
       dirtyRef.current = false;
       setCloud({ s: 'ok', at });
-      setSaveNotice('✓ Успешно сохранено в облако! На всех 6 ТВ обновится через несколько секунд.');
+      setSaveNotice('✓ Успешно сохранено в облако! На всех 3 ТВ обновится через несколько секунд.');
       setTimeout(() => setSaveNotice(''), 7000);
     } catch (e) {
       setCloud({ s: 'err', msg: String(e.message || e) });
@@ -407,7 +407,7 @@ export default function Admin() {
       <header className="sticky top-0 z-30 bg-zinc-900/80 backdrop-blur border-b border-zinc-800">
         <div className="max-w-[1480px] mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Суши ORDO — Админка (версия 2)</h1>
+            <h1 className="text-xl font-bold tracking-tight">Мангал-Бургер — Админка (версия 3)</h1>
             <p className="text-xs text-zinc-400">Figma-холст: тяни плашки мышкой куда хочешь → на ТВ будет 1-в-1. Данные живут в облаке — все устройства видят одно и то же.</p>
           </div>
           <div className="flex gap-2 items-center">
@@ -423,7 +423,7 @@ export default function Admin() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-xs font-semibold tracking-widest text-zinc-400 uppercase">Экраны</h2>
-              <button onClick={() => updateStore((d) => { const id = 'tv' + (d.screens.length + 1); d.screens.push({ id, name: `Экран ${d.screens.length + 1}`, slides: [{ id: uid(), type: 'image', bg: '/cafe-menu-board-v2/data/img/tv3-01.jpg', duration: 7, transition: 'fade', items: [{ ...createEmptyItem(), x: 6, y: 68, w: 52 }] }] }); })} className="text-xs px-2 py-1 rounded-lg bg-zinc-800 border border-zinc-700 hover:bg-zinc-700">+ Экран</button>
+              <button onClick={() => updateStore((d) => { const id = 'tv' + (d.screens.length + 1); d.screens.push({ id, name: `Экран ${d.screens.length + 1}`, slides: [{ id: uid(), type: 'image', bg: '/cafe-menu-board-v3/data/img/tv1-01.jpg', duration: 18, transition: 'fire', items: [{ ...createEmptyItem(), x: 6, y: 68, w: 52 }] }] }); })} className="text-xs px-2 py-1 rounded-lg bg-zinc-800 border border-zinc-700 hover:bg-zinc-700">+ Экран</button>
             </div>
             <div className="flex flex-col gap-2">
               {store.screens.map((s) => (
@@ -444,7 +444,7 @@ export default function Admin() {
             <div className="flex-1 min-h-0 flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xs font-semibold tracking-widest text-zinc-400 uppercase">Листы экрана</h2>
-                <button onClick={() => updateStore((d) => { const sc = d.screens.find((x) => x.id === activeScreenId); const ns = { id: uid(), type: 'image', bg: '/cafe-menu-board-v2/data/img/tv3-01.jpg', duration: 7, transition: 'fade', items: [{ ...createEmptyItem(), x: 6, y: 48, w: 48 }] }; sc.slides.push(ns); setActiveSlideId(ns.id); setSelectedId(ns.items[0].id); })} className="text-xs px-2 py-1 rounded-lg bg-white text-zinc-900 font-semibold hover:bg-zinc-100">+ Лист</button>
+                <button onClick={() => updateStore((d) => { const sc = d.screens.find((x) => x.id === activeScreenId); const ns = { id: uid(), type: 'image', bg: '/cafe-menu-board-v3/data/img/tv1-01.jpg', duration: 18, transition: 'fire', items: [{ ...createEmptyItem(), x: 6, y: 48, w: 48 }] }; sc.slides.push(ns); setActiveSlideId(ns.id); setSelectedId(ns.items[0].id); })} className="text-xs px-2 py-1 rounded-lg bg-white text-zinc-900 font-semibold hover:bg-zinc-100">+ Лист</button>
               </div>
               <div className="flex flex-col gap-2 overflow-auto pr-1">
                 {screen.slides.map((sl, i) => (
@@ -563,7 +563,7 @@ export default function Admin() {
                       <input value={slide.bg?.startsWith('data:') ? '— загружено из файла (сохранится на сайте) —' : slide.bg?.includes('/data/video/') ? '— видео загружено в облако —' : slide.bg} onChange={(e) => updateStore((d) => { d.screens.find((x) => x.id === activeScreenId).slides.find((x) => x.id === activeSlideId).bg = e.target.value; })} placeholder="https://... или /my-photo.jpg или Загрузить фото" className="flex-1 min-w-[200px] px-3 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 outline-none text-xs" />
                     </div>
                     <span className="text-[11px] text-zinc-500">Фото: JPG/PNG/WebP — сожмётся до 1920px. Видео: MP4 (H.264), до 90 МБ — загрузится прямо в облако (1-3 мин). Или вставь ссылку / путь <code className="bg-zinc-800 px-1 py-0.5 rounded">/file.jpg</code>.</span>
-                    {slide.bg?.startsWith('data:') && <button onClick={() => updateStore((d) => { d.screens.find((x) => x.id === activeScreenId).slides.find((x) => x.id === activeSlideId).bg = '/cafe-menu-board-v2/data/img/tv3-01.jpg'; })} className="self-start text-xs px-2 py-1 rounded-lg bg-zinc-800 border border-zinc-700">Убрать загруженное → вернуть демо</button>}
+                    {slide.bg?.startsWith('data:') && <button onClick={() => updateStore((d) => { d.screens.find((x) => x.id === activeScreenId).slides.find((x) => x.id === activeSlideId).bg = '/cafe-menu-board-v3/data/img/tv1-01.jpg'; })} className="self-start text-xs px-2 py-1 rounded-lg bg-zinc-800 border border-zinc-700">Убрать загруженное → вернуть демо</button>}
                   </label>
                 </section>
 

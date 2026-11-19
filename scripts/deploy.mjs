@@ -4,9 +4,9 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-const REPO = 'ahror1994/cafe-menu-board-v2';
+const REPO = 'ahror1994/cafe-menu-board-v3';
 const RAW_LIVE = `https://raw.githubusercontent.com/${REPO}/gh-pages/data/menu.json`;
-const LIVE = `https://ahror1994.github.io/cafe-menu-board-v2/data/menu.json`;
+const LIVE = `https://ahror1994.github.io/cafe-menu-board-v3/data/menu.json`;
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { stdio: 'inherit', shell: true });
@@ -66,7 +66,7 @@ try {
   for (const t of dataFiles) {
     const dest = 'dist/' + t.path;
     mkdirSync(path.dirname(dest), { recursive: true });
-    const r = await fetch(`https://ahror1994.github.io/cafe-menu-board-v2/${t.path}`);
+    const r = await fetch(`https://ahror1994.github.io/cafe-menu-board-v3/${t.path}`);
     if (r.ok) writeFileSync(dest, Buffer.from(await r.arrayBuffer()));
   }
   if (dataFiles.length) console.log(`[deploy] файлы облака перенесены: ${dataFiles.length} шт.`);

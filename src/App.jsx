@@ -3,28 +3,25 @@ import Admin from './pages/Admin';
 import TvPlayer from './pages/TvPlayer';
 
 const TV_LIST = [
-  { id: 'tv1', label: 'Экран 1', desc: 'Салаты, Рамен, Паста, Вок' },
-  { id: 'tv2', label: 'Экран 2', desc: 'Пицца' },
-  { id: 'tv3', label: 'Экран 3', desc: 'Бургеры и комбо' },
-  { id: 'tv4', label: 'Экран 4', desc: 'Сеты суши и роллов' },
-  { id: 'tv5', label: 'Экран 5', desc: 'Классические роллы и маки' },
-  { id: 'tv6', label: 'Экран 6', desc: 'Фирменные и запеченные роллы' },
+  { id: 'tv1', label: 'Экран 1', desc: 'Комбо, бургеры и снеки (10 слайдов)' },
+  { id: 'tv2', label: 'Экран 2', desc: 'Пицца (5 слайдов)' },
+  { id: 'tv3', label: 'Экран 3', desc: 'Салаты и горячие блюда (9 слайдов)' },
 ];
 
 function Home() {
-  const originUrl = typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : 'https://ahror1994.github.io/cafe-menu-board-v2/';
+  const originUrl = typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : 'https://ahror1994.github.io/cafe-menu-board-v3/';
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-6">
       <div className="max-w-[760px] w-full rounded-[24px] bg-zinc-900 border border-zinc-800 p-8 flex flex-col gap-6 shadow-2xl">
         <div className="border-b border-zinc-800 pb-5">
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-red-600/20 text-red-400 border border-red-500/30">Суши ORDO</span>
-            <span className="text-xs text-zinc-400 font-mono">версия 2 • 6 ТВ</span>
+            <span className="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-600/20 text-amber-400 border border-amber-500/30">🔥 Мангал-Бургер</span>
+            <span className="text-xs text-zinc-400 font-mono">версия 3 • 3 ТВ</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Cafe Menu Board — 6 Телевизоров</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Cafe Menu Board — 3 Телевизора</h1>
           <p className="text-zinc-400 text-sm mt-1 leading-relaxed">
-            Живое меню для 6 телевизоров с синхронизацией через облако. Правка цен и фото в админке без перерендера видео.
+            Живое меню для 3 телевизоров с яркой анимацией, переходами и синхронизацией через облако.
           </p>
         </div>
 
@@ -44,7 +41,7 @@ function Home() {
 
         <div>
           <h2 className="text-xs font-semibold tracking-wider text-zinc-400 uppercase mb-3">
-            Ссылки для 6 телевизоров:
+            Ссылки для 3 телевизоров:
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {TV_LIST.map((tv) => (
@@ -73,7 +70,7 @@ function Home() {
         <div className="p-4 rounded-xl bg-black/40 border border-zinc-800 text-xs text-zinc-400 space-y-1.5 leading-relaxed">
           <p className="font-semibold text-zinc-300">💡 Как подключить телевизоры:</p>
           <p>
-            1. Откройте на каждом ТВ встроенный браузер и перейдите по соответствующей ссылке: <code className="text-zinc-200 bg-zinc-800 px-1 py-0.5 rounded">#/tv/tv1</code> ... <code className="text-zinc-200 bg-zinc-800 px-1 py-0.5 rounded">#/tv/tv6</code>.
+            1. Откройте на каждом ТВ встроенный браузер и перейдите по соответствующей ссылке: <code className="text-zinc-200 bg-zinc-800 px-1 py-0.5 rounded">#/tv/tv1</code> ... <code className="text-zinc-200 bg-zinc-800 px-1 py-0.5 rounded">#/tv/tv3</code>.
           </p>
           <p>
             2. Нажмите клавишу <strong>F</strong> на клавиатуре или кликните по экрану для перехода в полноэкранный режим.

@@ -1,9 +1,9 @@
 {
-  "name": "cafe-menu-board-v2",
+  "name": "cafe-menu-board-v3",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://ahror1994.github.io/cafe-menu-board-v2",
+  "homepage": "https://ahror1994.github.io/cafe-menu-board-v3",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

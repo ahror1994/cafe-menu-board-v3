@@ -3,11 +3,11 @@
 // Запись — коммит через GitHub API, нужен токен (хранится только в браузере админа).
 import { normalizeStore } from './store.js';
 
-const REPO = 'ahror1994/cafe-menu-board-v2';
+const REPO = 'ahror1994/cafe-menu-board-v3';
 const BRANCH = 'gh-pages';
 const PATH = 'data/menu.json';
-export const TOKEN_KEY = 'sushi-ordo-gh-token';
-const FALLBACK_TOKEN_KEY = 'cafe-menu-gh-token';
+export const TOKEN_KEY = 'mangal-burger-gh-token';
+const FALLBACK_TOKEN_KEY = 'sushi-ordo-gh-token';
 
 const API = `https://api.github.com/repos/${REPO}`;
 
