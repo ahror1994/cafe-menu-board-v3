@@ -50,11 +50,52 @@ function makeSlides(tvId, count) {
   }));
 }
 
+function makeVideoSlide(id, filename, duration, transition = 'fire') {
+  return {
+    id,
+    type: 'video',
+    bg: `/cafe-menu-board-v3/data/video/${filename}`,
+    duration,
+    transition,
+    items: [],
+  };
+}
+
+function withVideos(slides, insertions) {
+  const out = [...slides];
+  // insertions sorted descending by index or applied in order with offset
+  let offset = 0;
+  for (const [idx, vSlide] of insertions) {
+    out.splice(idx + offset, 0, vSlide);
+    offset++;
+  }
+  return out;
+}
+
 const RAW_DEFAULT = {
   screens: [
-    { id: 'tv1', name: 'Экран 1', slides: makeSlides('tv1', 10) },
-    { id: 'tv2', name: 'Экран 2', slides: makeSlides('tv2', 5) },
-    { id: 'tv3', name: 'Экран 3', slides: makeSlides('tv3', 9) },
+    {
+      id: 'tv1',
+      name: 'Экран 1',
+      slides: withVideos(makeSlides('tv1', 10), [
+        [4, makeVideoSlide('v_tv1_1', 'tv1.mp4', 22, 'fire')],
+      ]),
+    },
+    {
+      id: 'tv2',
+      name: 'Экран 2',
+      slides: withVideos(makeSlides('tv2', 5), [
+        [1, makeVideoSlide('v_tv2_1', 'tv2.mp4', 28, 'prism')],
+        [3, makeVideoSlide('v_tv2_2', 'tv2-2.mp4', 30, 'crt')],
+      ]),
+    },
+    {
+      id: 'tv3',
+      name: 'Экран 3',
+      slides: withVideos(makeSlides('tv3', 9), [
+        [6, makeVideoSlide('v_tv3_1', 'tv3.mp4', 26, 'zoomBurst')],
+      ]),
+    },
   ],
 };
 

@@ -139,7 +139,7 @@ function TransitionFX({ type, fxKey }) {
   return null;
 }
 
-function Slide({ slide }) {
+function Slide({ slide, onVideoEnd, onVideoDuration }) {
   const isVideo = slide.type === 'video';
   const bg = resolveBg(slide.bg);
   return (
@@ -149,9 +149,14 @@ function Slide({ slide }) {
           src={bg}
           autoPlay
           muted
-          loop
           playsInline
           preload="auto"
+          onEnded={onVideoEnd}
+          onError={() => setTimeout(() => onVideoEnd?.(), 3000)}
+          onLoadedMetadata={(e) => {
+            const d = e.currentTarget.duration;
+            if (d && Number.isFinite(d) && d > 0) onVideoDuration?.(d);
+          }}
           className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (
@@ -196,6 +201,7 @@ export default function TvPlayer() {
   const [idx, setIdx] = useState(0);
   const [disp, setDisp] = useState(null);
   const [powerOn, setPowerOn] = useState(true);
+  const [videoDuration, setVideoDuration] = useState(null);
   const timerRef = useRef(null);
   const screen = store.screens.find((s) => s.id === id);
   const slides = screen?.slides?.length ? screen.slides : [];
@@ -320,16 +326,26 @@ export default function TvPlayer() {
   useEffect(() => {
     setIdx(0);
     setDisp(null);
+    setVideoDuration(null);
   }, [id, screen?.id]);
 
-  // autoplay
+  // Reset measured videoDuration when slide changes
+  useEffect(() => {
+    setVideoDuration(null);
+  }, [idx]);
+
+  // autoplay: for images use duration (18s); for videos wait for onEnded (with generous safety fallback)
   useEffect(() => {
     if (!slides.length || disp) return;
-    const dur = (slides[idx]?.duration || 18) * 1000;
+    const cur = slides[idx];
+    const isVideo = cur?.type === 'video';
+    const durMs = isVideo
+      ? ((cur?.duration || 30) + 15) * 1000
+      : (cur?.duration || 18) * 1000;
     timerRef.current = setTimeout(() => {
       const next = (idx + 1) % slides.length;
       goNext(next);
-    }, dur);
+    }, durMs);
     return () => clearTimeout(timerRef.current);
   }, [idx, slides, disp, goNext]);
 
@@ -413,7 +429,7 @@ export default function TvPlayer() {
     );
   }
   const current = slides[idx];
-  const currentDur = current.duration || 18;
+  const currentDur = current.type === 'video' && videoDuration ? Math.ceil(videoDuration) : (current.duration || 18);
 
   return (
     <div ref={containerRef} className="w-screen h-screen bg-black overflow-hidden relative select-none">
@@ -483,7 +499,15 @@ export default function TvPlayer() {
                 transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 will-change-transform"
               >
-                <Slide slide={current} />
+                <Slide
+                  slide={current}
+                  onVideoEnd={() => {
+                    if (disp) return;
+                    clearTimeout(timerRef.current);
+                    goNext((idx + 1) % slides.length);
+                  }}
+                  onVideoDuration={(d) => setVideoDuration(d)}
+                />
               </motion.div>
             </AnimatePresence>
             <TransitionFX type={effectiveTransition} fxKey={`fx-${current.id}-${idx}`} />
