@@ -143,7 +143,24 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
   const isVideo = slide.type === 'video';
   const bg = resolveBg(slide.bg);
   return (
-    <div className="absolute inset-0 overflow-hidden bg-black" style={{ perspective: 1200 }}>
+    <div
+      className="absolute inset-0 overflow-hidden bg-black flex items-center justify-center"
+      style={{
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#000',
+        overflow: 'hidden',
+        perspective: 1200,
+      }}
+    >
       {isVideo ? (
         <video
           src={bg}
@@ -157,15 +174,30 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
             const d = e.currentTarget.duration;
             if (d && Number.isFinite(d) && d > 0) onVideoDuration?.(d);
           }}
-          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            width: '100%',
+            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
         />
       ) : (
         <motion.img
           src={bg}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover will-change-transform"
-          initial={{ scale: 1.0 }}
-          animate={{ scale: 1.045 }}
+          className="will-change-transform"
+          style={{
+            width: '100%',
+            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+          initial={{ scale: 0.985 }}
+          animate={{ scale: 1.0 }}
           transition={{ duration: (slide.duration || 18) + 1, ease: 'linear' }}
         />
       )}
@@ -432,7 +464,11 @@ export default function TvPlayer() {
   const currentDur = current.type === 'video' && videoDuration ? Math.ceil(videoDuration) : (current.duration || 18);
 
   return (
-    <div ref={containerRef} className="w-screen h-screen bg-black overflow-hidden relative select-none">
+    <div
+      ref={containerRef}
+      className="w-screen h-screen bg-black overflow-hidden relative select-none"
+      style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', backgroundColor: '#000' }}
+    >
       {/* Top status bar */}
       <div
         className={`absolute top-0 inset-x-0 z-20 flex items-center justify-between px-4 py-2 bg-black/55 backdrop-blur text-white/90 text-xs tracking-wide transition-opacity duration-500 ${
@@ -457,7 +493,14 @@ export default function TvPlayer() {
       {/* Main stage */}
       <div
         className={`absolute inset-0 ${isFullscreen && !showChrome ? 'pt-0' : 'pt-8'} transition-all`}
-        style={{ perspective: 1400 }}
+        style={{
+          position: 'absolute',
+          top: isFullscreen && !showChrome ? 0 : 32,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          perspective: 1400,
+        }}
       >
         {disp ? (
           <div key={disp.key} className="absolute inset-0">
