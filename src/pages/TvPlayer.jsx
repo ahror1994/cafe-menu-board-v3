@@ -7,9 +7,9 @@ import GlassPill from '../components/GlassPill';
 import DisplacementTransition from '../components/DisplacementTransition';
 
 // метка версии сборки — видна в верхней полосе ТВ, чтобы понимать: свежая версия или кэш
-const APP_VERSION = '2026-11-20.4';
+const APP_VERSION = '2026-11-20.5';
 
-const AUTO_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'blinds', 'displacement'];
+const AUTO_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'slide'];
 
 function getFsElement() {
   return (
@@ -52,65 +52,70 @@ function exitDocFs() {
 }
 
 const variants = {
+  videoFade: {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  },
   fade: {
-    initial: { opacity: 0, scale: 1.04 },
+    initial: { opacity: 0, scale: 1.03 },
     animate: { opacity: 1, scale: 1 },
     exit: { opacity: 0, scale: 0.98 },
   },
   slide: {
-    initial: { x: '100%', opacity: 0.2 },
+    initial: { x: '100%', opacity: 0.25 },
     animate: { x: 0, opacity: 1 },
-    exit: { x: '-35%', opacity: 0 },
+    exit: { x: '-30%', opacity: 0 },
   },
   zoom: {
-    initial: { scale: 1.25, opacity: 0 },
+    initial: { scale: 1.18, opacity: 0 },
     animate: { scale: 1, opacity: 1 },
-    exit: { scale: 0.9, opacity: 0 },
+    exit: { scale: 0.92, opacity: 0 },
   },
   blinds: {
-    initial: { clipPath: 'inset(0 100% 0 0)', opacity: 0.4 },
-    animate: { clipPath: 'inset(0 0% 0 0)', opacity: 1 },
-    exit: { clipPath: 'inset(0 0 0 100%)', opacity: 0.2 },
+    initial: { scaleX: 0.08, opacity: 0.3, transformOrigin: 'left center' },
+    animate: { scaleX: 1, opacity: 1, transformOrigin: 'left center' },
+    exit: { scaleX: 0.08, opacity: 0, transformOrigin: 'right center' },
   },
   cube: {
-    initial: { rotateY: 88, opacity: 0.2, transformOrigin: 'right center' },
+    initial: { rotateY: 85, opacity: 0.2, transformOrigin: 'right center' },
     animate: { rotateY: 0, opacity: 1 },
-    exit: { rotateY: -88, opacity: 0.2, transformOrigin: 'left center' },
+    exit: { rotateY: -85, opacity: 0.2, transformOrigin: 'left center' },
   },
   pixel: {
-    initial: { opacity: 0, scale: 1.06, filter: 'contrast(1.6) saturate(1.5)' },
-    animate: { opacity: 1, scale: 1, filter: 'contrast(1) saturate(1)' },
-    exit: { opacity: 0, scale: 0.96, filter: 'contrast(1.4)' },
+    initial: { opacity: 0, scale: 1.06 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.95 },
   },
   fire: {
-    initial: { opacity: 0, scale: 1.12, filter: 'brightness(1.35) saturate(1.45)' },
-    animate: { opacity: 1, scale: 1, filter: 'brightness(1) saturate(1)' },
-    exit: { opacity: 0, scale: 0.95, filter: 'brightness(1.25) saturate(1.4)' },
+    initial: { opacity: 0, scale: 1.1 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.95 },
   },
   prism: {
-    initial: { x: '12%', scale: 1.08, opacity: 0, filter: 'saturate(1.6) hue-rotate(25deg)' },
-    animate: { x: 0, scale: 1, opacity: 1, filter: 'saturate(1) hue-rotate(0deg)' },
-    exit: { x: '-12%', scale: 0.96, opacity: 0, filter: 'saturate(1.5) hue-rotate(-25deg)' },
+    initial: { x: '12%', scale: 1.06, opacity: 0 },
+    animate: { x: 0, scale: 1, opacity: 1 },
+    exit: { x: '-12%', scale: 0.96, opacity: 0 },
   },
   crt: {
-    initial: { scaleY: 0.03, scaleX: 1.18, opacity: 0.9, filter: 'brightness(2.2) contrast(1.5)' },
-    animate: { scaleY: 1, scaleX: 1, opacity: 1, filter: 'brightness(1) contrast(1)' },
-    exit: { scaleY: 0.02, scaleX: 1.22, opacity: 0, filter: 'brightness(2.4) contrast(1.6)' },
+    initial: { scaleY: 0.04, scaleX: 1.12, opacity: 0.85 },
+    animate: { scaleY: 1, scaleX: 1, opacity: 1 },
+    exit: { scaleY: 0.03, scaleX: 1.14, opacity: 0 },
   },
   curtain: {
-    initial: { clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)', scale: 1.05, opacity: 0.6 },
-    animate: { clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', scale: 1, opacity: 1 },
-    exit: { clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)', scale: 0.97, opacity: 0.3 },
+    initial: { scaleX: 0.05, opacity: 0.4, transformOrigin: 'left center' },
+    animate: { scaleX: 1, opacity: 1, transformOrigin: 'left center' },
+    exit: { scaleX: 0.05, opacity: 0, transformOrigin: 'right center' },
   },
   zoomBurst: {
-    initial: { scale: 0.72, opacity: 0, filter: 'brightness(1.4) saturate(1.35)' },
-    animate: { scale: 1, opacity: 1, filter: 'brightness(1) saturate(1)' },
-    exit: { scale: 1.22, opacity: 0, filter: 'brightness(1.3)' },
+    initial: { scale: 0.8, opacity: 0 },
+    animate: { scale: 1, opacity: 1 },
+    exit: { scale: 1.16, opacity: 0 },
   },
   flip3d: {
-    initial: { rotateY: -90, scale: 0.9, opacity: 0 },
+    initial: { rotateY: -85, scale: 0.94, opacity: 0 },
     animate: { rotateY: 0, scale: 1, opacity: 1 },
-    exit: { rotateY: 90, scale: 0.9, opacity: 0 },
+    exit: { rotateY: 85, scale: 0.94, opacity: 0 },
   },
 };
 
@@ -133,22 +138,21 @@ const fxOverlayBase = {
   pointerEvents: 'none',
 };
 
-/** Colorful light-sweep / CRT / ember overlay during slide transitions */
+/** Colorful light-sweep / CRT / ember overlay during slide transitions (compositor-only, no mixBlendMode) */
 function TransitionFX({ type, fxKey }) {
-  if (!type || type === 'fade' || type === 'displacement') return null;
+  if (!type || type === 'fade' || type === 'displacement' || type === 'slide') return null;
 
   if (type === 'fire' || type === 'zoomBurst') {
     return (
       <motion.div
         key={fxKey}
-        initial={{ x: '-120%', opacity: 0.9 }}
-        animate={{ x: '130%', opacity: 0 }}
-        transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ x: '-115%', opacity: 0.85 }}
+        animate={{ x: '125%', opacity: 0 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         style={{
           ...fxOverlayBase,
           background:
-            'linear-gradient(105deg, transparent 0%, rgba(255,94,0,0.38) 35%, rgba(255,204,0,0.65) 50%, rgba(255,42,0,0.35) 65%, transparent 100%)',
-          mixBlendMode: 'screen',
+            'linear-gradient(105deg, transparent 0%, rgba(255,94,0,0.32) 35%, rgba(255,204,0,0.5) 50%, rgba(255,42,0,0.28) 65%, transparent 100%)',
         }}
       />
     );
@@ -158,14 +162,13 @@ function TransitionFX({ type, fxKey }) {
     return (
       <motion.div
         key={fxKey}
-        initial={{ x: '-110%', opacity: 0.85 }}
-        animate={{ x: '125%', opacity: 0 }}
-        transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ x: '-110%', opacity: 0.8 }}
+        animate={{ x: '120%', opacity: 0 }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
         style={{
           ...fxOverlayBase,
           background:
-            'linear-gradient(110deg, transparent 0%, rgba(255,0,128,0.35) 28%, rgba(255,196,0,0.55) 48%, rgba(0,229,255,0.45) 68%, transparent 100%)',
-          mixBlendMode: 'screen',
+            'linear-gradient(110deg, transparent 0%, rgba(255,0,128,0.28) 28%, rgba(255,196,0,0.45) 48%, rgba(0,229,255,0.36) 68%, transparent 100%)',
         }}
       />
     );
@@ -175,14 +178,13 @@ function TransitionFX({ type, fxKey }) {
     return (
       <motion.div
         key={fxKey}
-        initial={{ opacity: 0.95 }}
+        initial={{ opacity: 0.75 }}
         animate={{ opacity: 0 }}
-        transition={{ duration: 0.85, ease: 'easeOut' }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
         style={{
           ...fxOverlayBase,
-          backgroundImage:
-            'repeating-linear-gradient(0deg, rgba(255,255,255,0.16) 0px, rgba(255,255,255,0.16) 2px, transparent 2px, transparent 5px), radial-gradient(circle at center, rgba(255,180,60,0.38) 0%, rgba(0,220,255,0.2) 55%, rgba(0,0,0,0.5) 100%)',
-          mixBlendMode: 'screen',
+          background:
+            'radial-gradient(circle at center, rgba(255,210,120,0.45) 0%, rgba(0,220,255,0.22) 55%, transparent 90%)',
         }}
       />
     );
@@ -194,6 +196,17 @@ function TransitionFX({ type, fxKey }) {
 function Slide({ slide, onVideoEnd, onVideoDuration }) {
   const isVideo = slide.type === 'video';
   const bg = resolveBg(slide.bg);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (!isVideo) return;
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    const p = v.play?.();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+  }, [bg, isVideo]);
+
   return (
     <div
       style={{
@@ -214,11 +227,13 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
     >
       {isVideo ? (
         <video
+          ref={videoRef}
           src={bg}
           autoPlay
           muted
           playsInline
           preload="auto"
+          disablePictureInPicture
           onEnded={onVideoEnd}
           onError={() => setTimeout(() => onVideoEnd?.(), 3000)}
           onLoadedMetadata={(e) => {
@@ -235,10 +250,9 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
           }}
         />
       ) : (
-        <motion.img
+        <img
           src={bg}
           alt=""
-          className="will-change-transform"
           style={{
             width: '100%',
             height: '100%',
@@ -246,10 +260,9 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
             maxHeight: '100%',
             objectFit: 'contain',
             display: 'block',
+            willChange: 'transform',
+            animation: `tvKenBurns ${(slide.duration || 18) + 1}s linear forwards`,
           }}
-          initial={{ scale: 0.985 }}
-          animate={{ scale: 1.0 }}
-          transition={{ duration: (slide.duration || 18) + 1, ease: 'linear' }}
         />
       )}
       {/* Subtle warm mangal vignette */}
@@ -722,11 +735,15 @@ export default function TvPlayer() {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={current.id + '-' + idx}
-                variants={variants[effectiveTransition] || variants.fire}
+                variants={current.type === 'video' ? variants.videoFade : (variants[effectiveTransition] || variants.fire)}
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+                transition={
+                  current.type === 'video'
+                    ? { duration: 0.4, ease: 'easeOut' }
+                    : { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
+                }
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -749,7 +766,9 @@ export default function TvPlayer() {
                 />
               </motion.div>
             </AnimatePresence>
-            <TransitionFX type={effectiveTransition} fxKey={`fx-${current.id}-${idx}`} />
+            {current.type !== 'video' && (
+              <TransitionFX type={effectiveTransition} fxKey={`fx-${current.id}-${idx}`} />
+            )}
           </>
         )}
       </div>
@@ -825,13 +844,10 @@ export default function TvPlayer() {
         ))}
       </div>
 
-      {/* Subtle 18s progress bar at bottom */}
+      {/* Subtle 18s progress bar at bottom (CSS compositor animation, zero JS rAF) */}
       {!disp && (
-        <motion.div
-          key={`prog-${idx}-${current.id}`}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: currentDur, ease: 'linear' }}
+        <div
+          key={`prog-${idx}-${current.id}-${currentDur}`}
           style={{
             position: 'absolute',
             bottom: 0,
@@ -843,6 +859,8 @@ export default function TvPlayer() {
             transformOrigin: 'left center',
             background: 'linear-gradient(to right, #ef4444, #fbbf24, #fde047)',
             opacity: 0.85,
+            willChange: 'transform',
+            animation: `tvProgress ${currentDur}s linear forwards`,
           }}
         />
       )}

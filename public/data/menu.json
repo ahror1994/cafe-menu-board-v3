@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-19T17:17:38.439Z",
+  "updatedAt": "2026-11-20T09:53:42.341Z",
   "data": {
     "screens": [
       {
@@ -42,7 +42,7 @@
             "id": "v_tv1_1",
             "type": "video",
             "bg": "/cafe-menu-board-v3/data/video/tv1.mp4",
-            "duration": 22,
+            "duration": 23,
             "transition": "fire",
             "items": []
           },
@@ -67,7 +67,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv1-07.jpg",
             "duration": 18,
-            "transition": "blinds",
+            "transition": "slide",
             "items": []
           },
           {
@@ -75,7 +75,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv1-08.jpg",
             "duration": 18,
-            "transition": "displacement",
+            "transition": "fire",
             "items": []
           },
           {
@@ -83,7 +83,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv1-09.jpg",
             "duration": 18,
-            "transition": "fire",
+            "transition": "prism",
             "items": []
           },
           {
@@ -91,7 +91,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv1-10.jpg",
             "duration": 18,
-            "transition": "prism",
+            "transition": "crt",
             "items": []
           }
         ]
@@ -112,7 +112,7 @@
             "id": "v_tv2_1",
             "type": "video",
             "bg": "/cafe-menu-board-v3/data/video/tv2.mp4",
-            "duration": 28,
+            "duration": 29,
             "transition": "prism",
             "items": []
           },
@@ -136,7 +136,7 @@
             "id": "v_tv2_2",
             "type": "video",
             "bg": "/cafe-menu-board-v3/data/video/tv2-2.mp4",
-            "duration": 30,
+            "duration": 31,
             "transition": "crt",
             "items": []
           },
@@ -214,7 +214,7 @@
             "id": "v_tv3_1",
             "type": "video",
             "bg": "/cafe-menu-board-v3/data/video/tv3.mp4",
-            "duration": 26,
+            "duration": 27,
             "transition": "zoomBurst",
             "items": []
           },
@@ -223,7 +223,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv3-07.jpg",
             "duration": 18,
-            "transition": "blinds",
+            "transition": "slide",
             "items": []
           },
           {
@@ -231,7 +231,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv3-08.jpg",
             "duration": 18,
-            "transition": "displacement",
+            "transition": "fire",
             "items": []
           },
           {
@@ -239,7 +239,7 @@
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv3-09.jpg",
             "duration": 18,
-            "transition": "fire",
+            "transition": "prism",
             "items": []
           }
         ]

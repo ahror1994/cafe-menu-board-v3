@@ -38,7 +38,7 @@ function normalizeItem(raw, i) {
 }
 
 const SLIDE_DUR = 18;
-const MIX_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'blinds', 'displacement'];
+const MIX_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'slide'];
 
 function makeSlides(tvId, count) {
   return Array.from({ length: count }, (_, i) => ({
@@ -79,22 +79,22 @@ const RAW_DEFAULT = {
       id: 'tv1',
       name: 'Экран 1',
       slides: withVideos(makeSlides('tv1', 10), [
-        [4, makeVideoSlide('v_tv1_1', 'tv1.mp4', 22, 'fire')],
+        [4, makeVideoSlide('v_tv1_1', 'tv1.mp4', 23, 'fire')],
       ]),
     },
     {
       id: 'tv2',
       name: 'Экран 2',
       slides: withVideos(makeSlides('tv2', 5), [
-        [1, makeVideoSlide('v_tv2_1', 'tv2.mp4', 28, 'prism')],
-        [3, makeVideoSlide('v_tv2_2', 'tv2-2.mp4', 30, 'crt')],
+        [1, makeVideoSlide('v_tv2_1', 'tv2.mp4', 29, 'prism')],
+        [3, makeVideoSlide('v_tv2_2', 'tv2-2.mp4', 31, 'crt')],
       ]),
     },
     {
       id: 'tv3',
       name: 'Экран 3',
       slides: withVideos(makeSlides('tv3', 9), [
-        [6, makeVideoSlide('v_tv3_1', 'tv3.mp4', 26, 'zoomBurst')],
+        [6, makeVideoSlide('v_tv3_1', 'tv3.mp4', 27, 'zoomBurst')],
       ]),
     },
   ],

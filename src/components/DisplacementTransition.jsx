@@ -99,7 +99,7 @@ export default function DisplacementTransition({ from, to, duration = 1200, onDo
     let raf = 0;
 
     function resize() {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = 1;
       const w = canvas.clientWidth * dpr;
       const h = canvas.clientHeight * dpr;
       if (canvas.width !== w || canvas.height !== h) {
