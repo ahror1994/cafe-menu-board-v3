@@ -166,5 +166,5 @@ export default function DisplacementTransition({ from, to, duration = 1200, onDo
     };
   }, [from, to, duration, onDone]);
 
-  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} className="absolute inset-0 w-full h-full" />;
+  return <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'block' }} className="absolute inset-0 w-full h-full" />;
 }

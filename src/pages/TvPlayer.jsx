@@ -7,9 +7,49 @@ import GlassPill from '../components/GlassPill';
 import DisplacementTransition from '../components/DisplacementTransition';
 
 // метка версии сборки — видна в верхней полосе ТВ, чтобы понимать: свежая версия или кэш
-const APP_VERSION = '2026-11-19.3';
+const APP_VERSION = '2026-11-20.4';
 
 const AUTO_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'blinds', 'displacement'];
+
+function getFsElement() {
+  return (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement ||
+    null
+  );
+}
+
+function requestElFs(el) {
+  if (!el) return false;
+  const fn =
+    el.requestFullscreen ||
+    el.webkitRequestFullscreen ||
+    el.mozRequestFullScreen ||
+    el.msRequestFullscreen;
+  if (!fn) return false;
+  try {
+    const res = fn.call(el);
+    if (res && typeof res.catch === 'function') res.catch(() => {});
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function exitDocFs() {
+  const fn =
+    document.exitFullscreen ||
+    document.webkitExitFullscreen ||
+    document.mozCancelFullScreen ||
+    document.msExitFullscreen;
+  if (!fn) return;
+  try {
+    const res = fn.call(document);
+    if (res && typeof res.catch === 'function') res.catch(() => {});
+  } catch {}
+}
 
 const variants = {
   fade: {
@@ -81,6 +121,18 @@ function resolveBg(bg) {
   return bg;
 }
 
+const fxOverlayBase = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  zIndex: 15,
+  pointerEvents: 'none',
+};
+
 /** Colorful light-sweep / CRT / ember overlay during slide transitions */
 function TransitionFX({ type, fxKey }) {
   if (!type || type === 'fade' || type === 'displacement') return null;
@@ -92,8 +144,8 @@ function TransitionFX({ type, fxKey }) {
         initial={{ x: '-120%', opacity: 0.9 }}
         animate={{ x: '130%', opacity: 0 }}
         transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none absolute inset-0 z-15"
         style={{
+          ...fxOverlayBase,
           background:
             'linear-gradient(105deg, transparent 0%, rgba(255,94,0,0.38) 35%, rgba(255,204,0,0.65) 50%, rgba(255,42,0,0.35) 65%, transparent 100%)',
           mixBlendMode: 'screen',
@@ -109,8 +161,8 @@ function TransitionFX({ type, fxKey }) {
         initial={{ x: '-110%', opacity: 0.85 }}
         animate={{ x: '125%', opacity: 0 }}
         transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none absolute inset-0 z-15"
         style={{
+          ...fxOverlayBase,
           background:
             'linear-gradient(110deg, transparent 0%, rgba(255,0,128,0.35) 28%, rgba(255,196,0,0.55) 48%, rgba(0,229,255,0.45) 68%, transparent 100%)',
           mixBlendMode: 'screen',
@@ -126,8 +178,8 @@ function TransitionFX({ type, fxKey }) {
         initial={{ opacity: 0.95 }}
         animate={{ opacity: 0 }}
         transition={{ duration: 0.85, ease: 'easeOut' }}
-        className="pointer-events-none absolute inset-0 z-15"
         style={{
+          ...fxOverlayBase,
           backgroundImage:
             'repeating-linear-gradient(0deg, rgba(255,255,255,0.16) 0px, rgba(255,255,255,0.16) 2px, transparent 2px, transparent 5px), radial-gradient(circle at center, rgba(255,180,60,0.38) 0%, rgba(0,220,255,0.2) 55%, rgba(0,0,0,0.5) 100%)',
           mixBlendMode: 'screen',
@@ -144,7 +196,6 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
   const bg = resolveBg(slide.bg);
   return (
     <div
-      className="absolute inset-0 overflow-hidden bg-black flex items-center justify-center"
       style={{
         position: 'absolute',
         top: 0,
@@ -203,8 +254,13 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
       )}
       {/* Subtle warm mangal vignette */}
       <div
-        className="absolute inset-0 pointer-events-none"
         style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          pointerEvents: 'none',
           background:
             'radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,0.34) 100%), linear-gradient(to top, rgba(18,6,0,0.28) 0%, transparent 18%)',
         }}
@@ -226,6 +282,37 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
     </div>
   );
 }
+
+const fallbackScreenStyle = {
+  position: 'fixed',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  backgroundColor: '#0a0a0a',
+  color: '#fff',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 24,
+  gap: 12,
+  textAlign: 'center',
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+};
+
+const fallbackBadgeStyle = {
+  padding: '4px 12px',
+  borderRadius: 9999,
+  backgroundColor: 'rgba(217, 119, 6, 0.2)',
+  color: '#fbbf24',
+  border: '1px solid rgba(245, 158, 11, 0.3)',
+  fontSize: 12,
+  fontWeight: 700,
+};
 
 export default function TvPlayer() {
   const { id } = useParams();
@@ -382,47 +469,86 @@ export default function TvPlayer() {
   }, [idx, slides, disp, goNext]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [softFs, setSoftFs] = useState(false);
   const [showChrome, setShowChrome] = useState(true);
   const containerRef = useRef(null);
+  const chromeTimerRef = useRef(null);
+
+  const activeFs = isFullscreen || softFs;
+
   useEffect(() => {
-    const onFs = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    const onFs = () => {
+      const fs = Boolean(getFsElement());
+      setIsFullscreen(fs);
+      if (!fs) setSoftFs(false);
+    };
     document.addEventListener('fullscreenchange', onFs);
-    return () => document.removeEventListener('fullscreenchange', onFs);
+    document.addEventListener('webkitfullscreenchange', onFs);
+    document.addEventListener('mozfullscreenchange', onFs);
+    document.addEventListener('MSFullscreenChange', onFs);
+    return () => {
+      document.removeEventListener('fullscreenchange', onFs);
+      document.removeEventListener('webkitfullscreenchange', onFs);
+      document.removeEventListener('mozfullscreenchange', onFs);
+      document.removeEventListener('MSFullscreenChange', onFs);
+    };
   }, []);
+
   useEffect(() => {
-    if (!isFullscreen) {
+    if (!activeFs) {
+      clearTimeout(chromeTimerRef.current);
       setShowChrome(true);
       return;
     }
-    setShowChrome(true);
-    const t = setTimeout(() => setShowChrome(false), 4000);
+    setShowChrome(false);
     const onMove = () => {
       setShowChrome(true);
-      clearTimeout(t);
+      clearTimeout(chromeTimerRef.current);
+      chromeTimerRef.current = setTimeout(() => setShowChrome(false), 4000);
     };
     window.addEventListener('mousemove', onMove);
     return () => {
-      clearTimeout(t);
+      clearTimeout(chromeTimerRef.current);
       window.removeEventListener('mousemove', onMove);
     };
-  }, [isFullscreen, idx, disp]);
+  }, [activeFs]);
+
+  const enterFullscreen = useCallback(() => {
+    if (!requestElFs(containerRef.current)) {
+      requestElFs(document.documentElement);
+    }
+    setSoftFs(true);
+    setShowChrome(false);
+  }, []);
+
+  const exitFullscreen = useCallback(() => {
+    exitDocFs();
+    setSoftFs(false);
+    setShowChrome(true);
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (activeFs) exitFullscreen();
+    else enterFullscreen();
+  }, [activeFs, enterFullscreen, exitFullscreen]);
+
+  const handleStageClick = useCallback(() => {
+    if (!getFsElement()) {
+      enterFullscreen();
+    }
+  }, [enterFullscreen]);
+
   useEffect(() => {
     const onKey = (e) => {
       if (disp) return;
       if (e.key === 'ArrowRight') goNext((idx + 1) % slides.length);
       if (e.key === 'ArrowLeft') goNext((idx - 1 + slides.length) % slides.length);
-      if (e.key === 'f' || e.key === 'F') containerRef.current?.requestFullscreen?.().catch(() => {});
+      if (e.key === 'f' || e.key === 'F') enterFullscreen();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [slides.length, idx, disp, goNext]);
+  }, [slides.length, idx, disp, goNext, enterFullscreen]);
 
-  async function toggleFullscreen() {
-    try {
-      if (!document.fullscreenElement) await containerRef.current?.requestFullscreen();
-      else await document.exitFullscreen();
-    } catch {}
-  }
   function handleDispDone() {
     if (disp) {
       setIdx(disp.pendingIdx);
@@ -432,28 +558,24 @@ export default function TvPlayer() {
 
   if (!screen) {
     return (
-      <div className="w-screen h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-6 gap-3 select-none">
-        <div className="px-3 py-1 rounded-full bg-amber-600/20 text-amber-400 border border-amber-500/30 text-xs font-bold">
-          🔥 Мангал-Бургер
-        </div>
-        <h1 className="text-xl font-bold">Экран «{id}» не найден</h1>
-        <p className="text-zinc-400 text-sm">Проверьте список экранов в админке /admin</p>
+      <div style={fallbackScreenStyle}>
+        <div style={fallbackBadgeStyle}>🔥 Мангал-Бургер</div>
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Экран «{id}» не найден</h1>
+        <p style={{ color: '#a1a1aa', fontSize: 14, margin: 0 }}>Проверьте список экранов в админке /admin</p>
       </div>
     );
   }
 
   if (!slides.length) {
     return (
-      <div className="w-screen h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-6 gap-4 select-none">
-        <div className="px-3 py-1 rounded-full bg-amber-600/20 text-amber-400 border border-amber-500/30 text-xs font-bold">
-          🔥 Мангал-Бургер
-        </div>
-        <h1 className="text-2xl font-bold">
+      <div style={fallbackScreenStyle}>
+        <div style={fallbackBadgeStyle}>🔥 Мангал-Бургер</div>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>
           {screen.name} ({screen.id.toUpperCase()})
         </h1>
-        <p className="text-zinc-400 text-sm">
+        <p style={{ color: '#a1a1aa', fontSize: 14, margin: 0 }}>
           Экран подключен и ожидает слайды. Добавьте слайд в админке:{' '}
-          <a href="#/admin" className="text-white underline font-semibold">
+          <a href="#/admin" style={{ color: '#fff', textDecoration: 'underline', fontWeight: 600 }}>
             /admin
           </a>
         </p>
@@ -466,50 +588,115 @@ export default function TvPlayer() {
   return (
     <div
       ref={containerRef}
-      className="w-screen h-screen bg-black overflow-hidden relative select-none"
-      style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', backgroundColor: '#000' }}
+      onClick={handleStageClick}
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: '#000',
+        overflow: 'hidden',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        cursor: activeFs && !showChrome ? 'none' : 'pointer',
+      }}
     >
       {/* Top status bar */}
       <div
-        className={`absolute top-0 inset-x-0 z-20 flex items-center justify-between px-4 py-2 bg-black/55 backdrop-blur text-white/90 text-xs tracking-wide transition-opacity duration-500 ${
-          isFullscreen && !showChrome ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 38,
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          color: 'rgba(255,255,255,0.92)',
+          fontSize: 12,
+          letterSpacing: '0.025em',
+          opacity: activeFs && !showChrome ? 0 : 1,
+          pointerEvents: activeFs && !showChrome ? 'none' : 'auto',
+          transition: 'opacity 0.4s ease',
+          boxSizing: 'border-box',
+        }}
       >
         <span>
           🔥 Мангал-Бургер • {screen.name} • {idx + 1} / {slides.length} • {effectiveTransition} • {currentDur}с • v{APP_VERSION}{' '}
           {disp ? '• liquid warp…' : ''}
         </span>
-        <span className="flex items-center gap-2">
-          <span className="opacity-60 hidden sm:inline">← → листать • F фуллскрин</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="opacity-60 hidden sm:inline" style={{ opacity: 0.65 }}>
+            ← → листать • F фуллскрин
+          </span>
           <button
-            onClick={toggleFullscreen}
-            className="px-3 py-1.5 rounded-full bg-white text-black font-bold hover:bg-zinc-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFullscreen();
+            }}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 9999,
+              backgroundColor: '#fff',
+              color: '#000',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 12,
+            }}
           >
-            {isFullscreen ? 'Выйти' : '⛶ На весь экран'}
+            {activeFs ? 'Выйти' : '⛶ На весь экран'}
           </button>
         </span>
       </div>
 
       {/* Main stage */}
       <div
-        className={`absolute inset-0 ${isFullscreen && !showChrome ? 'pt-0' : 'pt-8'} transition-all`}
         style={{
           position: 'absolute',
-          top: isFullscreen && !showChrome ? 0 : 32,
+          top: activeFs && !showChrome ? 0 : 38,
           right: 0,
           bottom: 0,
           left: 0,
+          overflow: 'hidden',
+          backgroundColor: '#000',
           perspective: 1400,
         }}
       >
         {disp ? (
-          <div key={disp.key} className="absolute inset-0">
+          <div
+            key={disp.key}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          >
             <DisplacementTransition from={disp.from} to={disp.to} duration={1100} onDone={handleDispDone} />
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.45, duration: 0.5 }}
-              className="absolute inset-0 pointer-events-none"
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                pointerEvents: 'none',
+              }}
             >
               {slides[disp.pendingIdx]?.items?.map((item, i) => (
                 <motion.div
@@ -540,7 +727,16 @@ export default function TvPlayer() {
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 will-change-transform"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  willChange: 'transform, opacity',
+                }}
               >
                 <Slide
                   slide={current}
@@ -558,51 +754,73 @@ export default function TvPlayer() {
         )}
       </div>
 
-      {/* TV Power-On CRT Intro */}
-      <AnimatePresence>
-        {powerOn && (
+      {/* TV Power-On CRT Intro (unmounts unconditionally after 1000ms) */}
+      {powerOn && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.95, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 30,
+            backgroundColor: '#000',
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.95, ease: 'easeOut' }}
-            className="pointer-events-none absolute inset-0 z-30 bg-black flex items-center justify-center"
-          >
-            <motion.div
-              initial={{ scaleX: 0.05, scaleY: 0.008, opacity: 1 }}
-              animate={{ scaleX: 1.2, scaleY: 1.2, opacity: 0 }}
-              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full h-full"
-              style={{
-                background:
-                  'radial-gradient(ellipse at center, rgba(255,245,220,0.95) 0%, rgba(255,140,0,0.6) 40%, transparent 75%)',
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!isFullscreen && !disp && (
-        <button
-          onClick={toggleFullscreen}
-          className="absolute inset-0 z-10 cursor-pointer opacity-0"
-          aria-label="tap for fullscreen"
-        />
+            initial={{ scaleX: 0.05, scaleY: 0.008, opacity: 1 }}
+            animate={{ scaleX: 1.2, scaleY: 1.2, opacity: 0 }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              width: '100%',
+              height: '100%',
+              background:
+                'radial-gradient(ellipse at center, rgba(255,245,220,0.95) 0%, rgba(255,140,0,0.6) 40%, transparent 75%)',
+            }}
+          />
+        </motion.div>
       )}
 
       {/* Slide indicator dots */}
       <div
-        className={`absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 transition-opacity ${
-          isFullscreen && !showChrome ? 'opacity-0' : 'opacity-100'
-        }`}
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 20,
+          display: 'flex',
+          gap: 8,
+          opacity: activeFs && !showChrome ? 0 : 1,
+          pointerEvents: activeFs && !showChrome ? 'none' : 'auto',
+          transition: 'opacity 0.4s ease',
+        }}
       >
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => !disp && goNext(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === idx ? 'w-8 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'w-5 bg-white/35'
-            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!disp) goNext(i);
+            }}
+            style={{
+              height: 6,
+              width: i === idx ? 32 : 20,
+              borderRadius: 9999,
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              backgroundColor: i === idx ? '#fbbf24' : 'rgba(255,255,255,0.35)',
+              boxShadow: i === idx ? '0 0 8px rgba(251,191,36,0.8)' : 'none',
+              transition: 'all 0.25s ease',
+            }}
           />
         ))}
       </div>
@@ -614,8 +832,18 @@ export default function TvPlayer() {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: currentDur, ease: 'linear' }}
-          style={{ transformOrigin: 'left center' }}
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[3px] z-20 bg-gradient-to-r from-red-500 via-amber-400 to-yellow-300 opacity-85"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            zIndex: 20,
+            pointerEvents: 'none',
+            transformOrigin: 'left center',
+            background: 'linear-gradient(to right, #ef4444, #fbbf24, #fde047)',
+            opacity: 0.85,
+          }}
         />
       )}
 
