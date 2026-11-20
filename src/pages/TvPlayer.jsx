@@ -7,7 +7,7 @@ import GlassPill from '../components/GlassPill';
 import DisplacementTransition from '../components/DisplacementTransition';
 
 // метка версии сборки — видна в верхней полосе ТВ, чтобы понимать: свежая версия или кэш
-const APP_VERSION = '2026-11-20.6';
+const APP_VERSION = '2026-11-20.7';
 
 const AUTO_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'slide'];
 
@@ -203,8 +203,17 @@ function Slide({ slide, onVideoEnd, onVideoDuration }) {
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
+    v.setAttribute('playsinline', 'true');
+    v.setAttribute('webkit-playsinline', 'true');
     const p = v.play?.();
     if (p && typeof p.catch === 'function') p.catch(() => {});
+    return () => {
+      try {
+        v.pause();
+        v.removeAttribute('src');
+        v.load();
+      } catch {}
+    };
   }, [bg, isVideo]);
 
   return (
@@ -352,16 +361,14 @@ export default function TvPlayer() {
     return () => clearTimeout(t);
   }, [id]);
 
-  // Preload next 2 images so older TVs never flicker or lag on transitions
+  // Preload next 1 image so older TVs stay light on RAM and never lag on transitions
   useEffect(() => {
     if (slides.length < 2) return;
-    [1, 2].forEach((offset) => {
-      const s = slides[(safeIdx + offset) % slides.length];
-      if (s && s.type !== 'video' && s.bg) {
-        const img = new Image();
-        img.src = resolveBg(s.bg);
-      }
-    });
+    const s = slides[(safeIdx + 1) % slides.length];
+    if (s && s.type !== 'video' && s.bg) {
+      const img = new Image();
+      img.src = resolveBg(s.bg);
+    }
   }, [safeIdx, slides]);
 
   const effectiveTransition = useMemo(() => {
@@ -432,12 +439,35 @@ export default function TvPlayer() {
       if (ts === lastLocalTs.current) return;
       lastLocalTs.current = ts;
       setStore(loadStore());
-    }, 1000);
+    }, 10000);
     return () => {
       window.removeEventListener('storage', onStorage);
       clearInterval(iv);
     };
   }, []);
+
+  // Screen Wake Lock — не даём экрану ТВ уходить в сон во время показа меню
+  const wakeLockRef = useRef(null);
+  const requestWakeLock = useCallback(async () => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.wakeLock && typeof navigator.wakeLock.request === 'function') {
+        if (wakeLockRef.current && !wakeLockRef.current.released) return;
+        wakeLockRef.current = await navigator.wakeLock.request('screen');
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    requestWakeLock();
+    const onVisWake = () => {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    };
+    document.addEventListener('visibilitychange', onVisWake);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisWake);
+      try { wakeLockRef.current?.release?.().catch?.(() => {}); } catch {}
+    };
+  }, [requestWakeLock]);
 
   // облако: подтягиваем свежие данные (защита от устаревшего ответа CDN)
   const lastCloudTs = useRef(0);
@@ -451,7 +481,7 @@ export default function TvPlayer() {
   }, []);
   useEffect(() => {
     pollCloud();
-    const iv = setInterval(pollCloud, 5000);
+    const iv = setInterval(pollCloud, 60000);
     const onVis = () => {
       if (document.visibilityState !== 'hidden') pollCloud();
     };
@@ -516,23 +546,20 @@ export default function TvPlayer() {
   }, []);
 
   useEffect(() => {
-    if (!activeFs) {
-      clearTimeout(chromeTimerRef.current);
-      setShowChrome(true);
-      return;
-    }
-    setShowChrome(false);
-    const onMove = () => {
+    chromeTimerRef.current = setTimeout(() => setShowChrome(false), 5000);
+    const onActivity = () => {
       setShowChrome(true);
       clearTimeout(chromeTimerRef.current);
-      chromeTimerRef.current = setTimeout(() => setShowChrome(false), 4000);
+      chromeTimerRef.current = setTimeout(() => setShowChrome(false), 5000);
     };
-    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mousemove', onActivity);
+    window.addEventListener('touchstart', onActivity);
     return () => {
       clearTimeout(chromeTimerRef.current);
-      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mousemove', onActivity);
+      window.removeEventListener('touchstart', onActivity);
     };
-  }, [activeFs]);
+  }, []);
 
   const enterFullscreen = useCallback(() => {
     if (!requestElFs(containerRef.current)) {
@@ -540,12 +567,15 @@ export default function TvPlayer() {
     }
     setSoftFs(true);
     setShowChrome(false);
-  }, []);
+    requestWakeLock();
+  }, [requestWakeLock]);
 
   const exitFullscreen = useCallback(() => {
     exitDocFs();
     setSoftFs(false);
     setShowChrome(true);
+    clearTimeout(chromeTimerRef.current);
+    chromeTimerRef.current = setTimeout(() => setShowChrome(false), 5000);
   }, []);
 
   const toggleFullscreen = useCallback(() => {
@@ -554,10 +584,11 @@ export default function TvPlayer() {
   }, [activeFs, enterFullscreen, exitFullscreen]);
 
   const handleStageClick = useCallback(() => {
+    requestWakeLock();
     if (!getFsElement()) {
       enterFullscreen();
     }
-  }, [enterFullscreen]);
+  }, [enterFullscreen, requestWakeLock]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -622,10 +653,10 @@ export default function TvPlayer() {
         overflow: 'hidden',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        cursor: activeFs && !showChrome ? 'none' : 'pointer',
+        cursor: showChrome ? 'pointer' : 'none',
       }}
     >
-      {/* Top status bar */}
+      {/* Top status bar (floats on top, auto-hides after 5s) */}
       <div
         style={{
           position: 'absolute',
@@ -642,8 +673,8 @@ export default function TvPlayer() {
           color: 'rgba(255,255,255,0.92)',
           fontSize: 12,
           letterSpacing: '0.025em',
-          opacity: activeFs && !showChrome ? 0 : 1,
-          pointerEvents: activeFs && !showChrome ? 'none' : 'auto',
+          opacity: showChrome ? 1 : 0,
+          pointerEvents: showChrome ? 'auto' : 'none',
           transition: 'opacity 0.4s ease',
           boxSizing: 'border-box',
         }}
@@ -677,11 +708,11 @@ export default function TvPlayer() {
         </span>
       </div>
 
-      {/* Main stage */}
+      {/* Main stage (always 100% full-bleed top: 0 so proportions never shift) */}
       <div
         style={{
           position: 'absolute',
-          top: activeFs && !showChrome ? 0 : 38,
+          top: 0,
           right: 0,
           bottom: 0,
           left: 0,
@@ -825,8 +856,8 @@ export default function TvPlayer() {
           zIndex: 20,
           display: 'flex',
           gap: 8,
-          opacity: activeFs && !showChrome ? 0 : 1,
-          pointerEvents: activeFs && !showChrome ? 'none' : 'auto',
+          opacity: showChrome ? 1 : 0,
+          pointerEvents: showChrome ? 'auto' : 'none',
           transition: 'opacity 0.4s ease',
         }}
       >
@@ -873,15 +904,6 @@ export default function TvPlayer() {
         />
       )}
 
-      <ReloadEachHour />
     </div>
   );
-}
-
-function ReloadEachHour() {
-  useEffect(() => {
-    const iv = setInterval(() => window.location.reload(), 60 * 60 * 1000);
-    return () => clearInterval(iv);
-  }, []);
-  return null;
 }
