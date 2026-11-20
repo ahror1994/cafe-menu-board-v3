@@ -1,0 +1,273 @@
+{
+  "updatedAt": "2026-11-20T12:35:22.194Z",
+  "data": {
+    "screens": [
+      {
+        "id": "tv1",
+        "name": "Экран 1",
+        "slides": [
+          {
+            "id": "s_tv1_1",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-01.jpg",
+            "duration": 18,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv1_2",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-02.jpg",
+            "duration": 18,
+            "transition": "prism",
+            "items": []
+          },
+          {
+            "id": "s_tv1_3",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-03.jpg",
+            "duration": 18,
+            "transition": "crt",
+            "items": []
+          },
+          {
+            "id": "s_tv1_4",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-04.jpg",
+            "duration": 18,
+            "transition": "curtain",
+            "items": []
+          },
+          {
+            "id": "v_tv1_1",
+            "type": "video",
+            "bg": "/cafe-menu-board-v3/data/video/tv1.mp4",
+            "duration": 23,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "p_tv1_app",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv1_5",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-05.jpg",
+            "duration": 18,
+            "transition": "zoomBurst",
+            "items": []
+          },
+          {
+            "id": "s_tv1_6",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-06.jpg",
+            "duration": 18,
+            "transition": "flip3d",
+            "items": []
+          },
+          {
+            "id": "s_tv1_7",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-07.jpg",
+            "duration": 18,
+            "transition": "slide",
+            "items": []
+          },
+          {
+            "id": "s_tv1_8",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-08.jpg",
+            "duration": 18,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv1_9",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-09.jpg",
+            "duration": 18,
+            "transition": "prism",
+            "items": []
+          },
+          {
+            "id": "s_tv1_10",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv1-10.jpg",
+            "duration": 18,
+            "transition": "crt",
+            "items": []
+          }
+        ]
+      },
+      {
+        "id": "tv2",
+        "name": "Экран 2",
+        "slides": [
+          {
+            "id": "s_tv2_1",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv2-01.jpg",
+            "duration": 18,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "v_tv2_1",
+            "type": "video",
+            "bg": "/cafe-menu-board-v3/data/video/tv2.mp4",
+            "duration": 29,
+            "transition": "prism",
+            "items": []
+          },
+          {
+            "id": "p_tv2_app_1",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv2_2",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv2-02.jpg",
+            "duration": 18,
+            "transition": "prism",
+            "items": []
+          },
+          {
+            "id": "s_tv2_3",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv2-03.jpg",
+            "duration": 18,
+            "transition": "crt",
+            "items": []
+          },
+          {
+            "id": "v_tv2_2",
+            "type": "video",
+            "bg": "/cafe-menu-board-v3/data/video/tv2-2.mp4",
+            "duration": 31,
+            "transition": "crt",
+            "items": []
+          },
+          {
+            "id": "p_tv2_app_2",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "zoomBurst",
+            "items": []
+          },
+          {
+            "id": "s_tv2_4",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv2-04.jpg",
+            "duration": 18,
+            "transition": "curtain",
+            "items": []
+          },
+          {
+            "id": "s_tv2_5",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv2-05.jpg",
+            "duration": 18,
+            "transition": "zoomBurst",
+            "items": []
+          }
+        ]
+      },
+      {
+        "id": "tv3",
+        "name": "Экран 3",
+        "slides": [
+          {
+            "id": "s_tv3_1",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-01.jpg",
+            "duration": 18,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv3_2",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-02.jpg",
+            "duration": 18,
+            "transition": "prism",
+            "items": []
+          },
+          {
+            "id": "s_tv3_3",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-03.jpg",
+            "duration": 18,
+            "transition": "crt",
+            "items": []
+          },
+          {
+            "id": "s_tv3_4",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-04.jpg",
+            "duration": 18,
+            "transition": "curtain",
+            "items": []
+          },
+          {
+            "id": "s_tv3_6",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-06.jpg",
+            "duration": 18,
+            "transition": "flip3d",
+            "items": []
+          },
+          {
+            "id": "v_tv3_1",
+            "type": "video",
+            "bg": "/cafe-menu-board-v3/data/video/tv3.mp4",
+            "duration": 27,
+            "transition": "zoomBurst",
+            "items": []
+          },
+          {
+            "id": "p_tv3_app",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv3_7",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-07.jpg",
+            "duration": 18,
+            "transition": "slide",
+            "items": []
+          },
+          {
+            "id": "s_tv3_8",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-08.jpg",
+            "duration": 18,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "s_tv3_9",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/tv3-09.jpg",
+            "duration": 18,
+            "transition": "prism",
+            "items": []
+          }
+        ]
+      }
+    ]
+  }
+}
