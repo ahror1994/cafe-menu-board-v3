@@ -7,7 +7,7 @@ import GlassPill from '../components/GlassPill';
 import DisplacementTransition from '../components/DisplacementTransition';
 
 // метка версии сборки — видна в верхней полосе ТВ, чтобы понимать: свежая версия или кэш
-const APP_VERSION = '2026-11-20.5';
+const APP_VERSION = '2026-11-20.6';
 
 const AUTO_POOL = ['fire', 'prism', 'crt', 'curtain', 'zoomBurst', 'flip3d', 'slide'];
 
@@ -337,6 +337,13 @@ export default function TvPlayer() {
   const timerRef = useRef(null);
   const screen = store.screens.find((s) => s.id === id);
   const slides = screen?.slides?.length ? screen.slides : [];
+  const safeIdx = slides.length ? idx % slides.length : 0;
+
+  useEffect(() => {
+    if (slides.length && idx >= slides.length) {
+      setIdx(0);
+    }
+  }, [idx, slides.length]);
 
   // CRT / Cinema TV power-on intro on mount
   useEffect(() => {
@@ -349,29 +356,29 @@ export default function TvPlayer() {
   useEffect(() => {
     if (slides.length < 2) return;
     [1, 2].forEach((offset) => {
-      const s = slides[(idx + offset) % slides.length];
+      const s = slides[(safeIdx + offset) % slides.length];
       if (s && s.type !== 'video' && s.bg) {
         const img = new Image();
         img.src = resolveBg(s.bg);
       }
     });
-  }, [idx, slides]);
+  }, [safeIdx, slides]);
 
   const effectiveTransition = useMemo(() => {
-    const cur = slides[idx];
+    const cur = slides[safeIdx];
     if (!cur) return 'fire';
     if (!cur.transition || cur.transition === 'auto') {
-      return AUTO_POOL[idx % AUTO_POOL.length];
+      return AUTO_POOL[safeIdx % AUTO_POOL.length];
     }
     return cur.transition;
-  }, [slides, idx]);
+  }, [slides, safeIdx]);
 
   const goNext = useCallback(
     (nextIdx) => {
-      const cur = slides[idx];
+      const cur = slides[safeIdx];
       const nxt = slides[nextIdx];
       if (!cur || !nxt) return setIdx(nextIdx);
-      const curTr = cur.transition === 'auto' ? AUTO_POOL[idx % AUTO_POOL.length] : cur.transition;
+      const curTr = cur.transition === 'auto' ? AUTO_POOL[safeIdx % AUTO_POOL.length] : cur.transition;
       const nxtTr = nxt.transition === 'auto' ? AUTO_POOL[nextIdx % AUTO_POOL.length] : nxt.transition;
       const useDisp = curTr === 'displacement' || nxtTr === 'displacement';
       const needsTexture = useDisp && cur.type !== 'video' && nxt.type !== 'video';
@@ -386,7 +393,7 @@ export default function TvPlayer() {
         setIdx(nextIdx);
       }
     },
-    [slides, idx]
+    [slides, safeIdx]
   );
 
   // Safety timeout in case WebGL hangs on an older TV
@@ -432,14 +439,15 @@ export default function TvPlayer() {
     };
   }, []);
 
-  // облако: подтягиваем свежие данные
-  const lastCloud = useRef('');
+  // облако: подтягиваем свежие данные (защита от устаревшего ответа CDN)
+  const lastCloudTs = useRef(0);
   const pollCloud = useCallback(async () => {
     const cloud = await fetchCloud(10000, true);
-    if (!cloud?.updatedAt || cloud.updatedAt === lastCloud.current) return;
-    lastCloud.current = cloud.updatedAt;
+    const ct = cloud?.updatedAt ? Date.parse(cloud.updatedAt) || 0 : 0;
+    if (!ct || ct <= lastCloudTs.current) return;
+    lastCloudTs.current = ct;
     setStore(cloud.data);
-    cacheStore(cloud.data, Date.parse(cloud.updatedAt) || Date.now());
+    cacheStore(cloud.data, ct);
   }, []);
   useEffect(() => {
     pollCloud();
@@ -464,22 +472,22 @@ export default function TvPlayer() {
   // Reset measured videoDuration when slide changes
   useEffect(() => {
     setVideoDuration(null);
-  }, [idx]);
+  }, [safeIdx]);
 
   // autoplay: for images use duration (18s); for videos wait for onEnded (with generous safety fallback)
   useEffect(() => {
     if (!slides.length || disp) return;
-    const cur = slides[idx];
+    const cur = slides[safeIdx];
     const isVideo = cur?.type === 'video';
     const durMs = isVideo
       ? ((cur?.duration || 30) + 15) * 1000
       : (cur?.duration || 18) * 1000;
     timerRef.current = setTimeout(() => {
-      const next = (idx + 1) % slides.length;
+      const next = (safeIdx + 1) % slides.length;
       goNext(next);
     }, durMs);
     return () => clearTimeout(timerRef.current);
-  }, [idx, slides, disp, goNext]);
+  }, [safeIdx, slides, disp, goNext]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [softFs, setSoftFs] = useState(false);
@@ -554,13 +562,13 @@ export default function TvPlayer() {
   useEffect(() => {
     const onKey = (e) => {
       if (disp) return;
-      if (e.key === 'ArrowRight') goNext((idx + 1) % slides.length);
-      if (e.key === 'ArrowLeft') goNext((idx - 1 + slides.length) % slides.length);
+      if (e.key === 'ArrowRight') goNext((safeIdx + 1) % slides.length);
+      if (e.key === 'ArrowLeft') goNext((safeIdx - 1 + slides.length) % slides.length);
       if (e.key === 'f' || e.key === 'F') enterFullscreen();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [slides.length, idx, disp, goNext, enterFullscreen]);
+  }, [slides.length, safeIdx, disp, goNext, enterFullscreen]);
 
   function handleDispDone() {
     if (disp) {
@@ -595,7 +603,7 @@ export default function TvPlayer() {
       </div>
     );
   }
-  const current = slides[idx];
+  const current = slides[safeIdx];
   const currentDur = current.type === 'video' && videoDuration ? Math.ceil(videoDuration) : (current.duration || 18);
 
   return (
@@ -641,7 +649,7 @@ export default function TvPlayer() {
         }}
       >
         <span>
-          🔥 Мангал-Бургер • {screen.name} • {idx + 1} / {slides.length} • {effectiveTransition} • {currentDur}с • v{APP_VERSION}{' '}
+          🔥 Мангал-Бургер • {screen.name} • {safeIdx + 1} / {slides.length} • {effectiveTransition} • {currentDur}с • v{APP_VERSION}{' '}
           {disp ? '• liquid warp…' : ''}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -734,7 +742,7 @@ export default function TvPlayer() {
           <>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
-                key={current.id + '-' + idx}
+                key={current.id + '-' + safeIdx}
                 variants={current.type === 'video' ? variants.videoFade : (variants[effectiveTransition] || variants.fire)}
                 initial="initial"
                 animate="animate"
@@ -760,14 +768,14 @@ export default function TvPlayer() {
                   onVideoEnd={() => {
                     if (disp) return;
                     clearTimeout(timerRef.current);
-                    goNext((idx + 1) % slides.length);
+                    goNext((safeIdx + 1) % slides.length);
                   }}
                   onVideoDuration={(d) => setVideoDuration(d)}
                 />
               </motion.div>
             </AnimatePresence>
             {current.type !== 'video' && (
-              <TransitionFX type={effectiveTransition} fxKey={`fx-${current.id}-${idx}`} />
+              <TransitionFX type={effectiveTransition} fxKey={`fx-${current.id}-${safeIdx}`} />
             )}
           </>
         )}
@@ -831,13 +839,13 @@ export default function TvPlayer() {
             }}
             style={{
               height: 6,
-              width: i === idx ? 32 : 20,
+              width: i === safeIdx ? 32 : 20,
               borderRadius: 9999,
               border: 'none',
               padding: 0,
               cursor: 'pointer',
-              backgroundColor: i === idx ? '#fbbf24' : 'rgba(255,255,255,0.35)',
-              boxShadow: i === idx ? '0 0 8px rgba(251,191,36,0.8)' : 'none',
+              backgroundColor: i === safeIdx ? '#fbbf24' : 'rgba(255,255,255,0.35)',
+              boxShadow: i === safeIdx ? '0 0 8px rgba(251,191,36,0.8)' : 'none',
               transition: 'all 0.25s ease',
             }}
           />
@@ -847,7 +855,7 @@ export default function TvPlayer() {
       {/* Subtle 18s progress bar at bottom (CSS compositor animation, zero JS rAF) */}
       {!disp && (
         <div
-          key={`prog-${idx}-${current.id}-${currentDur}`}
+          key={`prog-${safeIdx}-${current.id}-${currentDur}`}
           style={{
             position: 'absolute',
             bottom: 0,

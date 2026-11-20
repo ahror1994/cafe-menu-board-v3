@@ -49,31 +49,45 @@ export function cloudFileUrl() { return `${import.meta.env.BASE_URL}${PATH}`; }
 
 const RAW_URL = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${PATH}`;
 
-// Запрашивает актуальные данные. При bust=true пробует raw.githubusercontent.com
-// (обновляется за 1 секунду) и GitHub Pages с защитой от кэширования (?t=Date.now())
+// Запрашивает актуальные данные параллельно из GitHub Pages и raw.githubusercontent.com,
+// выбирая самую свежую версию по updatedAt (чтобы старый кэш CDN никогда не перетирал новые правки)
 export async function fetchCloud(timeoutMs = 8000, bust = true) {
+  const ts = Date.now();
   const urls = bust
-    ? [`${RAW_URL}?t=${Date.now()}`, `${cloudFileUrl()}?t=${Date.now()}`]
+    ? [`${cloudFileUrl()}?t=${ts}`, `${RAW_URL}?t=${ts}`]
     : [cloudFileUrl(), RAW_URL];
 
-  for (const url of urls) {
-    try {
-      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const t = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
-      const res = await fetchStable(url, {
-        cache: bust ? 'no-store' : 'default',
-        ...(ctrl ? { signal: ctrl.signal } : {}),
-      }, 1);
-      if (t) clearTimeout(t);
-      if (!res.ok) continue;
-      const j = await res.json();
-      if (!j || !j.data || !Array.isArray(j.data.screens)) continue;
-      return { updatedAt: j.updatedAt || '', data: normalizeStore(j.data) };
-    } catch {
-      // пробуем следующий URL
+  const results = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const t = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
+        const res = await fetchStable(url, {
+          cache: bust ? 'no-store' : 'default',
+          ...(ctrl ? { signal: ctrl.signal } : {}),
+        }, 1);
+        if (t) clearTimeout(t);
+        if (!res.ok) return null;
+        const j = await res.json();
+        if (!j || !j.data || !Array.isArray(j.data.screens)) return null;
+        return { updatedAt: j.updatedAt || '', data: normalizeStore(j.data) };
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  let best = null;
+  let bestTs = -1;
+  for (const r of results) {
+    if (!r) continue;
+    const rt = Date.parse(r.updatedAt) || 0;
+    if (!best || rt > bestTs) {
+      best = r;
+      bestTs = rt;
     }
   }
-  return null;
+  return best;
 }
 
 function b64utf8(str) {
