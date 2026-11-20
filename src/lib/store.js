@@ -93,9 +93,10 @@ const RAW_DEFAULT = {
     {
       id: 'tv3',
       name: 'Экран 3',
-      slides: withVideos(makeSlides('tv3', 9), [
-        [6, makeVideoSlide('v_tv3_1', 'tv3.mp4', 27, 'zoomBurst')],
-      ]),
+      slides: withVideos(
+        makeSlides('tv3', 9).filter((s) => s.id !== 's_tv3_5'),
+        [[5, makeVideoSlide('v_tv3_1', 'tv3.mp4', 27, 'zoomBurst')]]
+      ),
     },
   ],
 };
