@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-20T12:08:41.936Z",
+  "updatedAt": "2026-11-20T12:35:22.194Z",
   "data": {
     "screens": [
       {
@@ -43,6 +43,14 @@
             "type": "video",
             "bg": "/cafe-menu-board-v3/data/video/tv1.mp4",
             "duration": 23,
+            "transition": "fire",
+            "items": []
+          },
+          {
+            "id": "p_tv1_app",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
             "transition": "fire",
             "items": []
           },
@@ -117,6 +125,14 @@
             "items": []
           },
           {
+            "id": "p_tv2_app_1",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "fire",
+            "items": []
+          },
+          {
             "id": "s_tv2_2",
             "type": "image",
             "bg": "/cafe-menu-board-v3/data/img/tv2-02.jpg",
@@ -138,6 +154,14 @@
             "bg": "/cafe-menu-board-v3/data/video/tv2-2.mp4",
             "duration": 31,
             "transition": "crt",
+            "items": []
+          },
+          {
+            "id": "p_tv2_app_2",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "zoomBurst",
             "items": []
           },
           {
@@ -208,6 +232,14 @@
             "bg": "/cafe-menu-board-v3/data/video/tv3.mp4",
             "duration": 27,
             "transition": "zoomBurst",
+            "items": []
+          },
+          {
+            "id": "p_tv3_app",
+            "type": "image",
+            "bg": "/cafe-menu-board-v3/data/img/promo-app.jpg",
+            "duration": 7,
+            "transition": "fire",
             "items": []
           },
           {

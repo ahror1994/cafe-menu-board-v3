@@ -62,6 +62,17 @@ function makeVideoSlide(id, filename, duration, transition = 'fire') {
   };
 }
 
+function makePromoSlide(id, transition = 'fire') {
+  return {
+    id,
+    type: 'image',
+    bg: '/cafe-menu-board-v3/data/img/promo-app.jpg',
+    duration: 7,
+    transition,
+    items: [],
+  };
+}
+
 function withVideos(slides, insertions) {
   const out = [...slides];
   // insertions sorted descending by index or applied in order with offset
@@ -80,6 +91,7 @@ const RAW_DEFAULT = {
       name: 'Экран 1',
       slides: withVideos(makeSlides('tv1', 10), [
         [4, makeVideoSlide('v_tv1_1', 'tv1.mp4', 23, 'fire')],
+        [4, makePromoSlide('p_tv1_app', 'fire')],
       ]),
     },
     {
@@ -87,7 +99,9 @@ const RAW_DEFAULT = {
       name: 'Экран 2',
       slides: withVideos(makeSlides('tv2', 5), [
         [1, makeVideoSlide('v_tv2_1', 'tv2.mp4', 29, 'prism')],
+        [1, makePromoSlide('p_tv2_app_1', 'fire')],
         [3, makeVideoSlide('v_tv2_2', 'tv2-2.mp4', 31, 'crt')],
+        [3, makePromoSlide('p_tv2_app_2', 'zoomBurst')],
       ]),
     },
     {
@@ -95,7 +109,10 @@ const RAW_DEFAULT = {
       name: 'Экран 3',
       slides: withVideos(
         makeSlides('tv3', 9).filter((s) => s.id !== 's_tv3_5'),
-        [[5, makeVideoSlide('v_tv3_1', 'tv3.mp4', 27, 'zoomBurst')]]
+        [
+          [5, makeVideoSlide('v_tv3_1', 'tv3.mp4', 27, 'zoomBurst')],
+          [5, makePromoSlide('p_tv3_app', 'fire')],
+        ]
       ),
     },
   ],
