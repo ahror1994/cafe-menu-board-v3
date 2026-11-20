@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { loadStore, saveStore, resetStore, wipeOldKeys, clearMenuKeys, localTs, cacheStore, TRANSITIONS, createEmptyItem, hexToRgba } from '../lib/store';
+import { loadStore, saveStore, resetStore, wipeOldKeys, clearMenuKeys, localTs, cacheStore, TRANSITIONS, createEmptyItem, hexToRgba, deepClone } from '../lib/store';
 import { fetchCloud, pushCloud, uploadRepoFile, getToken, setToken, hasToken, checkToken, normalizeTokenInput } from '../lib/cloud';
 import CanvasStage from '../components/CanvasStage';
 
@@ -267,7 +267,7 @@ export default function Admin() {
 
   function updateStore(fn) {
     setStore((prev) => {
-      const next = structuredClone(prev);
+      const next = deepClone(prev);
       fn(next);
       return next;
     });
@@ -290,25 +290,25 @@ export default function Admin() {
   const [copiedStyle, setCopiedStyle] = useState(null);
   function copyStyleFromSelected() {
     if (!selected) return;
-    setCopiedStyle(structuredClone(selected.style));
+    setCopiedStyle(deepClone(selected.style));
   }
   function pasteStyleToSelected() {
     if (!selected || !copiedStyle) return;
-    patchStyle(selected.id, structuredClone(copiedStyle));
+    patchStyle(selected.id, deepClone(copiedStyle));
   }
   function applyStyleToAllOnSlide() {
     if (!selected || !slide) return;
-    const style = structuredClone(selected.style);
+    const style = deepClone(selected.style);
     updateStore((d) => {
       const sl = d.screens.find((x) => x.id === activeScreenId).slides.find((x) => x.id === activeSlideId);
-      sl.items.forEach((it) => { it.style = structuredClone(style); });
+      sl.items.forEach((it) => { it.style = deepClone(style); });
     });
   }
   function applyStyleToAllEverywhere() {
     if (!selected) return;
-    const style = structuredClone(selected.style);
+    const style = deepClone(selected.style);
     updateStore((d) => {
-      d.screens.forEach((sc) => sc.slides.forEach((sl) => sl.items.forEach((it) => { it.style = structuredClone(style); })));
+      d.screens.forEach((sc) => sc.slides.forEach((sl) => sl.items.forEach((it) => { it.style = deepClone(style); })));
     });
   }
 
@@ -675,7 +675,7 @@ export default function Admin() {
 
                         <div className="flex gap-2">
                           <button onClick={() => patchItem(selected.id, { x: 6, y: 68, w: 36 })} className="flex-1 px-3 py-1.5 rounded-xl bg-zinc-700 text-xs hover:bg-zinc-600">Сбросить позицию</button>
-                          <button onClick={() => { const c = structuredClone(selected); c.id = uid(); c.x = Math.min(70, c.x + 4); c.y = Math.min(78, c.y + 4); updateStore((d) => { d.screens.find((x) => x.id === activeScreenId).slides.find((x) => x.id === activeSlideId).items.push(c); }); setSelectedId(c.id); }} className="flex-1 px-3 py-1.5 rounded-xl bg-white text-zinc-900 font-semibold text-xs">Дублировать</button>
+                          <button onClick={() => { const c = deepClone(selected); c.id = uid(); c.x = Math.min(70, c.x + 4); c.y = Math.min(78, c.y + 4); updateStore((d) => { d.screens.find((x) => x.id === activeScreenId).slides.find((x) => x.id === activeSlideId).items.push(c); }); setSelectedId(c.id); }} className="flex-1 px-3 py-1.5 rounded-xl bg-white text-zinc-900 font-semibold text-xs">Дублировать</button>
                         </div>
                       </div>
                     </div>

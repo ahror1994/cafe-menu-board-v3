@@ -3,6 +3,7 @@ const KEY = 'mangal-burger-menu-v3';
 const OLD_KEYS = ['sushi-ordo-menu-v2', 'cafe-menu-v3', 'cafe-menu-v2'];
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
+export function deepClone(v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); }
 
 function defaultStyle() {
   return {
@@ -119,7 +120,7 @@ export function normalizeStore(raw) {
     const id = `tv${i}`;
     if (!screens.some((s) => s.id === id)) {
       const defSc = RAW_DEFAULT.screens.find((s) => s.id === id);
-      screens.push(defSc ? structuredClone(defSc) : { id, name: `Экран ${i}`, slides: [] });
+      screens.push(defSc ? deepClone(defSc) : { id, name: `Экран ${i}`, slides: [] });
     }
   }
 
@@ -137,10 +138,10 @@ const DEFAULT = normalizeStore(RAW_DEFAULT);
 export function loadStore() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return structuredClone(DEFAULT);
+    if (!raw) return deepClone(DEFAULT);
     const parsed = JSON.parse(raw);
     return normalizeStore(parsed);
-  } catch { return structuredClone(DEFAULT); }
+  } catch { return deepClone(DEFAULT); }
 }
 
 export function wipeOldKeys() {
@@ -177,7 +178,7 @@ export function clearMenuKeys() {
 }
 
 export function resetStore() {
-  const d = structuredClone(DEFAULT);
+  const d = deepClone(DEFAULT);
   saveStore(d);
   return d;
 }

@@ -1,6 +1,28 @@
+import { Component } from 'react';
 import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import Admin from './pages/Admin';
 import TvPlayer from './pages/TvPlayer';
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ width: '100vw', height: '100vh', background: '#0a0a0a', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'sans-serif', textAlign: 'center' }}>
+          <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Ошибка запуска меню</div>
+          <div style={{ fontSize: 13, color: '#fca5a5', maxWidth: 600, wordBreak: 'break-word' }}>{String(this.state.error.message || this.state.error)}</div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const TV_LIST = [
   { id: 'tv1', label: 'Экран 1', desc: 'Комбо, бургеры и снеки (10 слайдов)' },
@@ -86,13 +108,15 @@ function Home() {
 
 export default function App() {
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/tv/:id" element={<TvPlayer />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/tv/:id" element={<TvPlayer />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </HashRouter>
+    </ErrorBoundary>
   );
 }

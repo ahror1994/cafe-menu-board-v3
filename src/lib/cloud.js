@@ -58,13 +58,13 @@ export async function fetchCloud(timeoutMs = 8000, bust = true) {
 
   for (const url of urls) {
     try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), timeoutMs);
+      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const t = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
       const res = await fetchStable(url, {
         cache: bust ? 'no-store' : 'default',
-        signal: ctrl.signal,
+        ...(ctrl ? { signal: ctrl.signal } : {}),
       }, 1);
-      clearTimeout(t);
+      if (t) clearTimeout(t);
       if (!res.ok) continue;
       const j = await res.json();
       if (!j || !j.data || !Array.isArray(j.data.screens)) continue;
